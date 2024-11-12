@@ -1,0 +1,9 @@
+streamlit
+tensorflow
+numpy
+plotly
+opencv-python-headless  # Use opencv-python-headless for non-GUI environments like Streamlit
+google-generativeai
+Pillow  
+python-dotenv
+openai
