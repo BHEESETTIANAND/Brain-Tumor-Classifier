@@ -204,7 +204,7 @@ if uploaded_file is not None:
         model = load_transfer_model('models/xception_model.weights.h5', 'xception')
         img_size =(299,299)
     else:
-        model = load_model('models/cnn_model3.h5')
+        model = load_model('models/cnn_model.h5')
         img_size = (224,224)
 
     img = image.load_img(uploaded_file, target_size=img_size)
