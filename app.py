@@ -316,8 +316,6 @@ if uploaded_file is not None or selected_file is not None:
     confidence = sorted_predictions[class_index]
 
     st.write("## Explanation")
-    # Use the selectbox to select a model
-    selected_llm = st.selectbox("Select an LLM", ("gpt-4o-mini"))
 
     if 'initialized' not in st.session_state:
         st.session_state.initialized = False
