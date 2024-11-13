@@ -15,6 +15,7 @@ import PIL.Image
 import os
 from dotenv import load_dotenv
 import openai
+import io
 
 load_dotenv()
 
@@ -54,7 +55,7 @@ def plot_predictions(predictions, class_index, predicted_label):
 output_dir = 'saliency_maps'
 os.makedirs(output_dir, exist_ok=True)
 
-def generate_saliency_map(model, img_array, class_index, img_size):
+def generate_saliency_map(model, img_array, class_index, img_size, file, filename):
   # Set up a tape to watch gradients while predicting
   with tf.GradientTape() as tape:
     # converts img array to tensor to be processed for tf
@@ -123,13 +124,13 @@ def generate_saliency_map(model, img_array, class_index, img_size):
   superimposed_img = superimposed_img.astype(np.uint8)
 
   # get MRI image path
-  img_path = os.path.join(output_dir, uploaded_file.name)
+  img_path = os.path.join(output_dir, filename)
   # save MRI image
   with open(img_path, "wb") as f:
-    f.write(uploaded_file.getbuffer())
+    f.write(file.getbuffer())
 
   # define map path
-  saliency_map_path = f'saliency map/{uploaded_file.name}'
+  saliency_map_path = f'saliency map/{filename}'
 
   # Save saliency map
   cv2.imwrite(saliency_map_path, cv2.cvtColor(superimposed_img, cv2.COLOR_RGB2BGR))
@@ -170,19 +171,45 @@ def load_transfer_model(model_path, model_name):
 
 st.title('Brain Tumor Classifier')
 
-st.write("Upload an image of a brain MRI scan")
+image_paths = ["Select an image"] + [os.path.join('images', file) for file in os.listdir('images') if os.path.isfile(os.path.join('images', file))]
 
-uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+col1, col2 = st.columns(2)
+with col1:
+    selected_image = st.selectbox("Select an image from dataset", image_paths)
+    selected_file = None    
+    if selected_image != 'Select an image':
+        selected_file = open(selected_image, "rb")  # Create a file variable based on selected_image
+        selected_file = selected_file.read()  # Read the file content into a variable
+        selected_file = io.BytesIO(selected_file)  # Convert to BytesIO for compatibility
+        selected_file_name = os.path.basename(selected_image)
+        source = "select"
+        uploaded_file = None
+with col2:
+    uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
+    if uploaded_file is not None:
+        source = "upload"
+        selected_file = None
+        selected_image = "Select an image"
+
+if 'selected_image' not in st.session_state:
+    st.session_state.selected_image = "Select an image"
 
 if 'uploaded_file' not in st.session_state:
     st.session_state.uploaded_file = None
 
-if uploaded_file is not None:
+if uploaded_file is not None or selected_file is not None:
 
-    if uploaded_file != st.session_state.uploaded_file:
-        st.session_state.initialized = False
+    print('uploaded file', uploaded_file)
+    print('st session uploaded file', st.session_state.uploaded_file)
     
+    print('selected file', selected_image)
+    print('st session selected file', st.session_state.selected_image)
+    if uploaded_file != st.session_state.uploaded_file or selected_image != st.session_state.selected_image:
+        st.session_state.initialized = False
+
+    print('init', st.session_state.initialized)
     st.session_state.uploaded_file = uploaded_file
+    st.session_state.selected_image = selected_image
 
     if 'selected_model' not in st.session_state:
         st.session_state.selected_model = ""
@@ -198,7 +225,7 @@ if uploaded_file is not None:
     st.session_state.selected_model = selected_model
 
     if selected_model == 'MobileNet':
-        model = load_transfer_model('models/mobilenet_model.weights.h5', 'mobilenet')
+        model = load_transfer_model('models/MobileNet_model.weights.h5', 'mobilenet')
         img_size = (224,224)
     elif selected_model == "Xception":
         model = load_transfer_model('models/xception_model.weights.h5', 'xception')
@@ -207,7 +234,10 @@ if uploaded_file is not None:
         model = load_model('models/cnn_model.h5')
         img_size = (224,224)
 
-    img = image.load_img(uploaded_file, target_size=img_size)
+    if source == 'upload':
+        img = image.load_img(uploaded_file, target_size=img_size)
+    elif source == 'select':
+        img = image.load_img(selected_file, target_size=img_size)
     img_array = image.img_to_array(img)
     img_array = np.expand_dims(img_array, axis=0)
     img_array /= 255.0
@@ -263,21 +293,30 @@ if uploaded_file is not None:
     st.plotly_chart(fig, use_column_width=True)
 
     st.write("### Saliency Map")
-    saliency_map = generate_saliency_map(model, img_array, class_index, img_size)
+    if source == 'upload':
+        saliency_map = generate_saliency_map(model, img_array, class_index, img_size, uploaded_file, uploaded_file.name)
+    elif source == 'select':
+        saliency_map = generate_saliency_map(model, img_array, class_index, img_size, selected_file, selected_file_name)
 
     col1, col2 = st.columns(2)
     with col1:
-        st.image(uploaded_file, caption="Uploaded MRI Scan", use_column_width=True)
+        if source == 'upload':
+            st.image(uploaded_file, caption="Uploaded MRI Scan", use_column_width=True)
+        elif source == 'select':
+            st.image(selected_file, caption="Uploaded MRI Scan", use_column_width=True)
     with col2:
         st.image(saliency_map, caption="Saliency Map", use_column_width=True)
 
-    saliency_map_path = f'saliency_maps/{uploaded_file.name}'
+    if source == 'upload':
+        saliency_map_path = f'saliency_maps/{uploaded_file.name}'
+    elif source == 'select':
+        saliency_map_path = f'saliency_maps/{selected_file_name}'
 
     confidence = sorted_predictions[class_index]
 
     st.write("## Explanation")
     # Use the selectbox to select a model
-
+    selected_llm = st.selectbox("Select an LLM", ("gpt-4o-mini"))
 
     if 'initialized' not in st.session_state:
         st.session_state.initialized = False
