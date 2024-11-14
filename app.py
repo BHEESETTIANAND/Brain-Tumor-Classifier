@@ -217,7 +217,7 @@ if uploaded_file is not None or selected_file is not None:
 
     selected_model = st.selectbox(
     "Select Model:",
-    ("Xception", "MobileNet", "Custom CNN"))
+    ("Xception - Transfer Learning", "MobileNet - Transfer Learning", "Custom CNN"))
 
     
     if selected_model != st.session_state.selected_model:
@@ -225,10 +225,10 @@ if uploaded_file is not None or selected_file is not None:
     
     st.session_state.selected_model = selected_model
 
-    if selected_model == 'MobileNet':
+    if selected_model == 'MobileNet - Transfer Learning':
         model = load_transfer_model('models/MobileNet_model.weights.h5', 'mobilenet')
         img_size = (224,224)
-    elif selected_model == "Xception":
+    elif selected_model == "Xception - Transfer Learning":
         model = load_transfer_model('models/xception_model.weights.h5', 'xception')
         img_size =(299,299)
     else:
@@ -329,8 +329,6 @@ if uploaded_file is not None or selected_file is not None:
         st.session_state.initialized = False
     
     st.session_state.user_prompt = user_prompt
-    
-
 
     prompt = f"""
     You are an expert neurologist. You are tasked with explaining a saliency map of a brain tumor MRI scan.
@@ -340,14 +338,18 @@ if uploaded_file is not None or selected_file is not None:
 
     The deep learning model predicted the image to be of class '{result}' with a confidence of {confidence*100}%.
 
-    In your response:
-    - Explain what regions of the brain the model is focusing on, based on the saliency map. 
-    Refer to the regions highlighted in light cyan, those are the regions where the model is focusing on.
-    - Explain possible reasons why the model made the prediction it did, adapting the level of detail to the user's experience. If the user is unfamiliar with the topic, provide a simpler explanation, while offering a more detailed analysis if they request it.
-
     This is the user's prompt on how it wants the results to be explained: {st.session_state.user_prompt}
 
-    Let's think step by step about this. Verify step by step.
+     Discuss the saliency map:
+     - Explain the specific regions of the brain that the saliency map highlights. Mention areas that are critical for the classification of the tumor. If the image shows regions highlighted in light cyan or any other color, refer to these as the model's areas of focus.
+     - Identify any anatomical or functional parts of the brain that the model is focusing on, such as areas of the frontal lobe, temporal lobe, or brainstem, if relevant.
+     - Interpret the model's prediction:
+       - Explain why the model classified the MRI as {result}. Give a clear, step-by-step breakdown of how the model might have arrived at this classification, based on the highlighted regions and general characteristics of each type of tumor.
+       - Discuss factors that might influence the model's prediction, such as tumor size, location, or texture, and how these are captured by the saliency map.
+
+     Let's think about this step by step and verify the reasoning.
+
+     NEVER EVER mention the saliency map or the machine learning model.
     """
 
     chat_prompt = f"""
@@ -373,6 +375,8 @@ if uploaded_file is not None or selected_file is not None:
     User's desired explanation style:
     The user has a specific way they would like the results explained, based on their level of understanding. This is indicated in the prompt: {st.session_state.user_prompt}. Tailor your explanation based on this request.
     Let’s think step-by-step and adapt your response based on these instructions.
+
+    NEVER EVER mention the saliency map or the machine learning model.
     """
 
     if user_prompt:
@@ -380,17 +384,8 @@ if uploaded_file is not None or selected_file is not None:
         model = genai.GenerativeModel(model_name='gemini-1.5-flash')
         response = model.generate_content([prompt, img])
 
-        # if 'chat' not in st.session_state:
-        #     st.session_state.chat = model.start_chat(
-        #         history=[
-        #         {"role": "user", "parts": user_prompt},
-        #         {"role": "model", "parts": response.text},
-        #         ]
-        #     )
-
         if not st.session_state.initialized:
             st.session_state.messages = []
-            #st.session_state.messages.append({"role": "user", "content": user_prompt})
             st.session_state.messages.append({"role": "assistant", "content": response.text})
             st.session_state.initialized = True
 
