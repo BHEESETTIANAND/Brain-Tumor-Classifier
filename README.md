@@ -3,7 +3,7 @@ A machine learning project utilizing CNN models to detect brain tumors in MRI sc
 Visit here: [Brain Tumor Classifier](https://brain-tumor-classifier-7.streamlit.app/)
 
 ## Preview
-![Preview of Brain Tumor Classifier](assets/preview.png)
+![Preview of Brain Tumor Classifier](preview.png)
 
 ## Features
 - **User-Friendly Upload & Predict**: Easily upload MRI images and receive tumor classification results.
