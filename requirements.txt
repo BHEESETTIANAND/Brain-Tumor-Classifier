@@ -7,4 +7,3 @@ google-generativeai
 Pillow  
 python-dotenv
 openai
-base64
