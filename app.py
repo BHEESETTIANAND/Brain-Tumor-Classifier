@@ -324,131 +324,131 @@ if uploaded_file is not None or selected_file is not None:
 
     confidence = sorted_predictions[class_index]
 
-    st.write("## Explanation")
+    # st.write("## Explanation")
 
-    if 'initialized' not in st.session_state:
-        st.session_state.initialized = False
+    # if 'initialized' not in st.session_state:
+    #     st.session_state.initialized = False
 
-    if 'user_prompt' not in st.session_state:
-        st.session_state.user_prompt = ""
+    # if 'user_prompt' not in st.session_state:
+    #     st.session_state.user_prompt = ""
 
-    user_prompt = st.text_input("How would you like the results to be explained ?", placeholder="Explain to me like I am a 5 year old")
+    # user_prompt = st.text_input("How would you like the results to be explained ?", placeholder="Explain to me like I am a 5 year old")
 
-    if user_prompt != st.session_state.user_prompt:
-        st.session_state.initialized = False
+    # if user_prompt != st.session_state.user_prompt:
+    #     st.session_state.initialized = False
     
-    st.session_state.user_prompt = user_prompt
+    # st.session_state.user_prompt = user_prompt
 
-    image_prompt = f"""
-    You are an expert neurologist tasked with explaining a brain tumor MRI scan. The scan includes a visual map that highlights regions of interest.
+    # image_prompt = f"""
+    # You are an expert neurologist tasked with explaining a brain tumor MRI scan. The scan includes a visual map that highlights regions of interest.
 
-    The highlighted regions, especially the light cyan areas, represent the strongest gradients in the analysis. These regions indicate where the model focused most heavily when determining the classification.
+    # The highlighted regions, especially the light cyan areas, represent the strongest gradients in the analysis. These regions indicate where the model focused most heavily when determining the classification.
 
-    The analysis has classified the MRI as {result}. This is the user's prompt on how they want the results to be explained: {st.session_state.user_prompt}.
+    # The analysis has classified the MRI as {result}. This is the user's prompt on how they want the results to be explained: {st.session_state.user_prompt}.
 
-    Discuss the highlighted map:
+    # Discuss the highlighted map:
 
-    Explain the specific regions of the brain the cyan areas correspond to. Mention any critical regions contributing to the classification.
-    Identify the anatomical or functional brain areas, such as the frontal lobe, temporal lobe, or brainstem, emphasized in the map, if relevant.
-    Interpret the analysis by explaining how these highlighted regions might relate to the characteristics of {result}, such as tumor size, texture, or location.
-    Let's think about this step by step to ensure clarity.
+    # Explain the specific regions of the brain the cyan areas correspond to. Mention any critical regions contributing to the classification.
+    # Identify the anatomical or functional brain areas, such as the frontal lobe, temporal lobe, or brainstem, emphasized in the map, if relevant.
+    # Interpret the analysis by explaining how these highlighted regions might relate to the characteristics of {result}, such as tumor size, texture, or location.
+    # Let's think about this step by step to ensure clarity.
 
-    NEVER mention the saliency map, machine learning, or the confidence of the prediction. Limit your explanation to 5 sentences maximum. 
-    """
+    # NEVER mention the saliency map, machine learning, or the confidence of the prediction. Limit your explanation to 5 sentences maximum. 
+    # """
 
-    chat_prompt = f"""
-    You are an expert neurologist and radiologist, with extensive experience explaining medical imaging and diagnostic insights in a clear, patient-centered manner. Your task is to discuss the results of a brain MRI scan, focusing on the highlighted regions that indicate critical areas of interest, and the classification of a potential tumor.
+    # chat_prompt = f"""
+    # You are an expert neurologist and radiologist, with extensive experience explaining medical imaging and diagnostic insights in a clear, patient-centered manner. Your task is to discuss the results of a brain MRI scan, focusing on the highlighted regions that indicate critical areas of interest, and the classification of a potential tumor.
 
-    The diagnostic analysis categorizes the tumor into one of the following: glioma, meningioma, pituitary tumor, or no tumor.
+    # The diagnostic analysis categorizes the tumor into one of the following: glioma, meningioma, pituitary tumor, or no tumor.
 
-    The highlighted regions, particularly those in light cyan, represent areas of significant focus. These regions correspond to key areas that influenced the classification based on the scan’s features.
+    # The highlighted regions, particularly those in light cyan, represent areas of significant focus. These regions correspond to key areas that influenced the classification based on the scan’s features.
 
-    The analysis concluded that the tumor is classified as {result}.
+    # The analysis concluded that the tumor is classified as {result}.
 
-    Here’s how you should guide the conversation:
+    # Here’s how you should guide the conversation:
 
-    Discuss the highlighted map:
+    # Discuss the highlighted map:
 
-    Explain which parts of the brain are emphasized and why they are critical for the classification.
-    Highlight any specific anatomical or functional brain regions, such as the frontal lobe, temporal lobe, or brainstem, that correspond to the areas of interest.
-    Interpret the classification:
+    # Explain which parts of the brain are emphasized and why they are critical for the classification.
+    # Highlight any specific anatomical or functional brain regions, such as the frontal lobe, temporal lobe, or brainstem, that correspond to the areas of interest.
+    # Interpret the classification:
 
-    Describe the reasoning behind the classification of {result}, step by step, based on the features and characteristics of the tumor type.
-    Mention factors that may have contributed to this conclusion, such as the size, texture, or location of the tumor, as seen in the scan.
-    Adapt to the user’s knowledge level:
+    # Describe the reasoning behind the classification of {result}, step by step, based on the features and characteristics of the tumor type.
+    # Mention factors that may have contributed to this conclusion, such as the size, texture, or location of the tumor, as seen in the scan.
+    # Adapt to the user’s knowledge level:
 
-    For users unfamiliar with medical details, provide a simplified explanation. For example, describe the cyan regions as showing the parts of the brain where the scan revealed the most notable differences indicative of a tumor.
-    If the user seeks more detail, delve into advanced aspects, such as how specific brain structures correlate with the tumor type and the general diagnostic process.
-    Enable a continued conversation:
+    # For users unfamiliar with medical details, provide a simplified explanation. For example, describe the cyan regions as showing the parts of the brain where the scan revealed the most notable differences indicative of a tumor.
+    # If the user seeks more detail, delve into advanced aspects, such as how specific brain structures correlate with the tumor type and the general diagnostic process.
+    # Enable a continued conversation:
 
-    Invite the user to ask follow-up questions to clarify or expand on the explanation.
-    Adjust your response dynamically based on the user’s level of understanding or curiosity, using the style indicated in their prompt: {st.session_state.user_prompt}.
-    IMPORTANT:
+    # Invite the user to ask follow-up questions to clarify or expand on the explanation.
+    # Adjust your response dynamically based on the user’s level of understanding or curiosity, using the style indicated in their prompt: {st.session_state.user_prompt}.
+    # IMPORTANT:
 
-    Do not mention the terms "saliency map" or "machine learning model."
-    Tailor the explanation to ensure it aligns with the user’s preferred style and understanding.
-    Keep the response conversational and patient-focused, encouraging an ongoing dialogue.
-    """
+    # Do not mention the terms "saliency map" or "machine learning model."
+    # Tailor the explanation to ensure it aligns with the user’s preferred style and understanding.
+    # Keep the response conversational and patient-focused, encouraging an ongoing dialogue.
+    # """
 
-    if user_prompt:
-        response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {
-            "role": "system",
-            "content": image_prompt
-            },
-            {
-            "role": "user", "content": 
-            [
-                {"type": "text", "text": user_prompt},
-                {"type": "image_url", "image_url": 
-                    {"url": f"data:image/jpeg;base64,{base64_image}"} 
-                }
-            ]
-            }
-        ],
-        )
+    # if user_prompt:
+    #     response = client.chat.completions.create(
+    #     model="gpt-4o-mini",
+    #     messages=[
+    #         {
+    #         "role": "system",
+    #         "content": image_prompt
+    #         },
+    #         {
+    #         "role": "user", "content": 
+    #         [
+    #             {"type": "text", "text": user_prompt},
+    #             {"type": "image_url", "image_url": 
+    #                 {"url": f"data:image/jpeg;base64,{base64_image}"} 
+    #             }
+    #         ]
+    #         }
+    #     ],
+    #     )
 
-        if not st.session_state.initialized:
-            st.session_state.messages = []
-            st.session_state.messages.append({"role": "assistant", "content": response.choices[0].message.content})
-            st.session_state.initialized = True
+    #     if not st.session_state.initialized:
+    #         st.session_state.messages = []
+    #         st.session_state.messages.append({"role": "assistant", "content": response.choices[0].message.content})
+    #         st.session_state.initialized = True
 
 
-    if 'messages' in st.session_state:
-        for message in st.session_state.messages:
-            with st.chat_message(message['role']):
-                st.markdown(message['content'])
+    # if 'messages' in st.session_state:
+    #     for message in st.session_state.messages:
+    #         with st.chat_message(message['role']):
+    #             st.markdown(message['content'])
 
-    # Accept user input
-    if user_prompt:
-        if user_input:= st.chat_input(""):
-            # Add user message to chat history
-            st.session_state.messages.append({"role": "user", "content": user_input})
-            with st.chat_message('user'):
-                st.markdown(user_input)
-            with st.chat_message("assistant"):
-                stream = client.chat.completions.create(
-                    model="gpt-4o-mini",
-                    messages=[
-                        {"role": "system", "content": chat_prompt},
-                        {"role": "user", "content": 
-                            [
-                                {"type": "text", "text": user_prompt},
-                                {"type": "image_url", "image_url": 
-                                    {"url": f"data:image/jpeg;base64,{base64_image}"} 
-                                }
-                            ]
-                        },
-                        *[
-                            {"role": m["role"], "content": m["content"]}
-                            for m in st.session_state.messages
-                        ]
-                    ],
-                    stream=True,    
-                )
-                response = st.write_stream(stream)
+    # # Accept user input
+    # if user_prompt:
+    #     if user_input:= st.chat_input(""):
+    #         # Add user message to chat history
+    #         st.session_state.messages.append({"role": "user", "content": user_input})
+    #         with st.chat_message('user'):
+    #             st.markdown(user_input)
+    #         with st.chat_message("assistant"):
+    #             stream = client.chat.completions.create(
+    #                 model="gpt-4o-mini",
+    #                 messages=[
+    #                     {"role": "system", "content": chat_prompt},
+    #                     {"role": "user", "content": 
+    #                         [
+    #                             {"type": "text", "text": user_prompt},
+    #                             {"type": "image_url", "image_url": 
+    #                                 {"url": f"data:image/jpeg;base64,{base64_image}"} 
+    #                             }
+    #                         ]
+    #                     },
+    #                     *[
+    #                         {"role": m["role"], "content": m["content"]}
+    #                         for m in st.session_state.messages
+    #                     ]
+    #                 ],
+    #                 stream=True,    
+    #             )
+    #             response = st.write_stream(stream)
 
-            st.session_state.messages.append({"role": "assistant", "content": response})
-            print(response)
+    #         st.session_state.messages.append({"role": "assistant", "content": response})
+    #         print(response)
