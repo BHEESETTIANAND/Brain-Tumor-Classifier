@@ -21,9 +21,9 @@ import base64
 # Configuration
 load_dotenv()
 
-genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
-openai.api_key = os.getenv('OPENAI_API_KEY')
-client = openai.OpenAI()
+# genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
+# openai.api_key = os.getenv('OPENAI_API_KEY')
+# client = openai.OpenAI()
 
 def plot_predictions(predictions, class_index, predicted_label):
  
